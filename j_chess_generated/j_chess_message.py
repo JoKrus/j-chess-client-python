@@ -23,6 +23,7 @@ class ErrorType(Enum):
     TOO_MANY_TRIES = "TOO_MANY_TRIES"
     UNSUPPORTED_OPERATION = "UNSUPPORTED_OPERATION"
     DUPLICATE_NAME = "DUPLICATE_NAME"
+    VERSION_MISMATCH = "VERSION_MISMATCH"
 
 
 @dataclass
@@ -614,5 +615,14 @@ class JchessMessage:
             "type": "Attribute",
             "required": True,
             "pattern": r"([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})|(\{[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\})",
+        }
+    )
+    schema_version: str = field(
+        init=False,
+        default="0.1.1",
+        metadata={
+            "name": "schemaVersion",
+            "type": "Attribute",
+            "required": True,
         }
     )
