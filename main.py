@@ -1,9 +1,10 @@
 import socket as socket_lib
-import j_chess_generated
-from j_chess_io.j_chess_io import JChessIOHandler
 import uuid
+
 import j_chess_ai.base_ai as base_ai
 import j_chess_ai.sample_ais as sample_ais
+import j_chess_generated
+from j_chess_io.j_chess_io import JChessIOHandler
 
 
 class Client:
@@ -28,9 +29,17 @@ class Client:
 
         reply = self.j_chess_io_socket.read_j_chess()
         # TODO handle error cases
-        assert reply.message_type == j_chess_generated.JchessMessageType.LOGIN_REPLY
-        self.player_id = reply.login_reply.new_id
-        print(f"login successful with id={self.player_id}")
+        if reply.message_type == j_chess_generated.JchessMessageType.LOGIN_REPLY:
+            self.player_id = reply.login_reply.new_id
+            print(f"login successful with id={self.player_id}")
+        elif reply.message_type == j_chess_generated.JchessMessageType.ACCEPT:
+            print(f"Error occurred but client could reconnect {reply.accept.error_type_code}")
+            self.is_running = False  # retry if DUPLICATE_NAME
+        elif reply.message_type == j_chess_generated.JchessMessageType.DISCONNECT:
+            print(f"Error occurred and client was disconnected with the reason {reply.disconnect.error_type_code}")
+            self.is_running = False
+        else:
+            self.is_running = False  # Unknown thing occured
 
     def play(self):
         while self.is_running:
